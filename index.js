@@ -26,10 +26,6 @@ app.get("/", function (req, res) {
   res.sendFile(process.cwd() + "/views/index.html");
 });
 
-// You can POST a URL to /api/shorturl and get a JSON response with original_url and short_url properties. Here's an example: { original_url : 'https://freeCodeCamp.org', short_url : 1}
-// When you visit /api/shorturl/<short_url>, you will be redirected to the original URL.
-// If you pass an invalid URL that doesn't follow the valid http://www.example.com format, the JSON response will contain { error: 'invalid url' }
-
 const URLSchema = mongoose.Schema(
   {
     longURL: String,
@@ -41,6 +37,7 @@ const URLSchema = mongoose.Schema(
 
 const URL = mongoose.model("URL", URLSchema);
 
+//Might need to update the RNG with another library
 function shorten() {
   const characters =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -69,9 +66,11 @@ app.post("/api/shorturl", async (req, res) => {
   removeOldEntries();
   const url = req.body.url;
 
+  //Would replace this with client-side form validation in the future
   if (!url.includes("https://") && !url.includes("http://")) {
     return res.json({ error: "invalid url" });
   }
+
   try {
     const checkObject = await URL.findOne({ longURL: url });
     if (checkObject?.shortURL) {
@@ -94,7 +93,7 @@ app.post("/api/shorturl", async (req, res) => {
 
 // add /api/get-link endpoint to read 'http://service-domain/{publicId}', find mongo entry by checking the id, and then respond the real link
 
-app.get("/:shorturl", async (req, res) => {
+app.get("/api/get-link/:shorturl", async (req, res) => {
   const shorturl = req.params.shorturl;
   try {
     const checkObject = await URL.findOne({ shortURL: shorturl });
