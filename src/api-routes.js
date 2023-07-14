@@ -1,7 +1,6 @@
-const { removeOldEntries, shorten } = require('./util')
-const { URL } = require('../mongo-models')
-const routes = function(app) {
-
+const { removeOldEntries, shorten } = require("./util");
+const { URL } = require("../mongo-models");
+const routes = function (app) {
   //Post URL (check if its already in the collection; if YES return and extend timer), convert and save to MongoDB, return JSON
   app.post("/api/shorturl", async (req, res) => {
     removeOldEntries(URL);
@@ -22,7 +21,7 @@ const routes = function(app) {
         const newObject = new URL({
           longURL: url,
           shortURL: shorten(),
-          issuedDate: Date.now()
+          issuedDate: Date.now(),
         });
         await newObject.save();
         res.json({ shortURL: newObject.shortURL });
@@ -53,7 +52,6 @@ const routes = function(app) {
       res.send(err);
     }
   });
+};
 
-}
-
-module.exports = routes
+module.exports = routes;
