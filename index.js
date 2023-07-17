@@ -1,29 +1,23 @@
 require("dotenv").config();
-const { connect: mongoConnect, connState } = require('./mongo-connector')
 const express = require("express");
 const cors = require("cors");
 const app = express();
-const { LISTENING_PORT } = require('./config')
-const apiRoutes = require('./src/api-routes')
-
-mongoConnect()
+const { LISTENING_PORT } = require("./config");
+const router = require("./src/router");
 
 // Express Configuration
 app.use(cors());
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/public", express.static(`${process.cwd()}/public`));
-
-// Get DB health
-app.get("/db-health", (req, res) => {
-  res.json({ status: connState() });
-});
 
 // Serve index page
 app.get("/", function (req, res) {
   res.sendFile(process.cwd() + "/views/index.html");
 });
 
-apiRoutes(app)
+//Use src/router.js
+app.use("/", router);
 
 app.listen(LISTENING_PORT, "0.0.0.0", function () {
   console.log(`Listening on port ${LISTENING_PORT}`);
