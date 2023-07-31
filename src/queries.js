@@ -1,4 +1,4 @@
-const checkEntry = "SELECT * FROM url_shortener WHERE longURL = $1";
+const checkEntry = "SELECT count(*) FROM url_shortener WHERE longURL = $1";
 
 const updateEntry =
   "UPDATE url_shortener SET issuedDate = $1 WHERE longURL = $2 RETURNING shortURL";
