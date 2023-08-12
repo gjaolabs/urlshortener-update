@@ -1,54 +1,33 @@
-const db = require("./db");
-const queries = require("./queries");
 /**
  * shortUrl is our unique key in the Link Model
  *
  * @type {{getLink(*), saveLink(*), countLink(*), updateLink(*, *)}}
  */
-let dbDriver;
+
+const PgLinkRepository = require("./postgres/pg_link_repository");
+
+let dbImpl = new PgLinkRepository();
 
 class LinkRepository {
-
   constructor(dbImpl) {
-    this.dbImpl = dbImpl
+    this.dbImpl = dbImpl;
   }
 
   async countLink(longUrl) {
-    await dbImpl.countLink(longUrl)
+    return await dbImpl.countLink(longUrl);
   }
 
   async getLink(shortUrl) {
-    await dbImpl.getLink(shortUrl)
+    return await dbImpl.getLink(shortUrl);
   }
 
   async updateLink(longURL, dateNow) {
-    await dbImpl.updateLink(longURL, dateNow)
+    return await dbImpl.updateLink(longURL, dateNow);
   }
 
   async saveLink(longUrl, shortUrl, dateNow) {
-    await dbImpl.saveLink(longUrl, shortUrl, dateNow)
+    return await dbImpl.saveLink(longUrl, shortUrl, dateNow);
   }
-}
-
-class PgLinkRepository {
-
-  constructor(dbConn) {
-    this.dbConn = dbConn;
-  }
-
-  async countLink(longUrl) {
-    await dbConn.query(queries.checkEntry, [longUrl])
-  }
-
-  async updateLink(longUrl, dateNow) {
-    // TODO: use named params instead of positions in query
-    await dbConn.query(queries.updateEntry, [dateNow, longUrl])
-  }
-
-  async saveLink(longUrl, shortUrl, dateNow) {
-    await db.query(queries.createEntry, [longUrl, shortUrl, dateNow])
-  }
-
 }
 
 class MongoLinkRepository {
@@ -56,6 +35,6 @@ class MongoLinkRepository {
 }
 
 // 1 === 1 can be a config setting.
-let dbImpl = 1 === 1 ? new PgLinkRepository(db) : new MongoLinkRepository()
+//let dbImpl = 1 === 1 ? new PgLinkRepository(db) : new MongoLinkRepository();
 
-module.exports = new LinkRepository(dbImpl)
+module.exports = new LinkRepository(dbImpl);

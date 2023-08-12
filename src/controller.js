@@ -1,16 +1,17 @@
-const db = require("./db");
-const queries = require("./queries");
-const { dateToDB, shorten } = require("./util.js");
-const linkRepository = require("link_repository")
+const db = require("./postgres/db");
+const queries = require("./postgres/queries");
+const { dateToISO, shorten } = require("./util.js");
+const linkRepository = require("./link_repository");
 
 const postEntry = async (req, res) => {
   const url = req.body.url;
-  const now = dateToDB(); // you can take utc time from server no need to ping DB
+  const now = dateToISO();
   try {
     //Check if it exists, if YES update Date, return JSON
     const linkCount = await linkRepository.countLink(url);
+
     // TODO: refactor response to be number not rows
-    if (linkCount.rows[0] > 0) {
+    if (linkCount > 0) {
       //Entry exists, update DATE, return shortURL JSON
       const results = await linkRepository.updateLink(url, now);
       return res
@@ -23,7 +24,6 @@ const postEntry = async (req, res) => {
       return res
         .status(200)
         .json({ message: "New Entry Created.", response: results.rows });
-
     }
   } catch (error) {
     console.error("Error Executing Query", error);

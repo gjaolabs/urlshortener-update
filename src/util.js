@@ -10,7 +10,7 @@ function shorten() {
 }
 
 //Create Date object and convert to Postgres-appropriate format
-function dateToDB() {
+function dateToISO() {
   const currentDate = new Date();
   const postgresDateTime = currentDate.toISOString();
   return postgresDateTime;
@@ -18,5 +18,5 @@ function dateToDB() {
 
 module.exports = {
   shorten,
-  dateToDB,
+  dateToISO,
 };
