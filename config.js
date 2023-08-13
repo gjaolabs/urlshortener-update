@@ -1,3 +1,4 @@
 module.exports = {
-  LISTENING_PORT: process.env.PORT || 3000,
+  listeningPort: process.env.PORT || 3000,
+  dbType: "postgres",
 };

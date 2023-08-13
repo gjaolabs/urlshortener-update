@@ -25,10 +25,6 @@ class LinkRepository {
   }
 }
 
-class MongoLinkRepository {
-  // todo: implement me. This and PG repositories can be in separate modules.
-}
-
 // 1 === 1 can be a config setting.
 //let dbImpl = 1 === 1 ? new PgLinkRepository(db) : new MongoLinkRepository();
 

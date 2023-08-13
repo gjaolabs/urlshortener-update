@@ -35,38 +35,40 @@ function makeController(db) {
 
   // add /api/get-link endpoint to read 'http://service-domain/{publicId}', find entry by checking the id, and then respond the real link in JSON
 
-  const getEntry = (req, res) => {
+  const getEntry = async (req, res) => {
     const shorturl = req.params.shorturl;
     try {
-      db.query(queries.findEntry, [shorturl], (error, results) => {
-        //If entry exists return longURL
-        if (results.rows.length > 0) {
-          res
-            .status(200)
-            .json({ message: "URL Has Been Found.", response: results.rows });
-        } else {
-          res.status(200).json({ message: "Entry Does Not Exist." });
-        }
-      });
+      const foundLink = await linkRepository.getLink(shorturl);
+      console.log(foundLink);
+      //If entry exists return longURL
+      if (foundLink.rows[0]) {
+        res.status(200).json({
+          message: "URL Has Been Found.",
+          response: foundLink.rows,
+        });
+      } else {
+        res.status(200).json({ message: "Entry Does Not Exist." });
+      }
     } catch (error) {
       console.error("Error Executing Query.", error);
       res.status(500).json({ error: "Internal server error." });
     }
   };
 
-  // add another endpoint that instead od responding string, will execute 302 redirect. Map it to 'api/redirect/shorturl'
-  const getRedirect = (req, res) => {
+  // add another endpoint that instead od responding string, will execute 302 redirect. Map it to 'open/shorturl'
+  const getRedirect = async (req, res) => {
     const shorturl = req.params.shorturl;
     try {
-      db.query(queries.findEntry, [shorturl], (error, results) => {
-        if (results.rows.length > 0) {
-          res.status(302).redirect(results.rows[0].longurl);
-        } else {
-          res
-            .status(200)
-            .json({ message: "Entry Does Not Exist. Cannot Redirect." });
-        }
-      });
+      const foundLink = await linkRepository.getLink(shorturl);
+      console.log(foundLink);
+
+      if (foundLink.rows[0]) {
+        res.status(302).redirect(foundLink.rows[0].longurl);
+      } else {
+        res
+          .status(200)
+          .json({ message: "Entry Does Not Exist. Cannot Redirect." });
+      }
     } catch (error) {
       console.error("Error Executing Query.", error);
       res.status(500).json({ error: "Internal Server Error." });

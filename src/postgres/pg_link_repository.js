@@ -10,6 +10,11 @@ class PgLinkRepository {
     return parseInt(rows[0].count);
   }
 
+  async getLink(shortUrl) {
+    const longUrl = await dbConn.query(queries.findEntry, [shortUrl]);
+    return longUrl;
+  }
+
   async updateLink(longUrl, dateNow) {
     // TODO: use named params instead of positions in query
     // await dbConn.query(queries.updateEntry2, { issuedDate, longUrl });
