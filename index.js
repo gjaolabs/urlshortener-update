@@ -4,6 +4,7 @@ const cors = require("cors");
 const app = express();
 const config = require("./config");
 const makeRouter = require("./src/router");
+const mongoConnect = require("./src/mongo/connector");
 
 // Express Configuration
 app.use(cors());
@@ -19,16 +20,23 @@ app.get("/", function (req, res) {
 // setup database
 let dbImpl;
 
-if (config?.dbType === "mongo") {
+if (config?.DB_TYPE === "mongo") {
+  mongoConnect.connect();
+  console.log("Using MongoDB");
+  console.log(mongoConnect.connState());
+  const db = require("./src/mongo/models");
+  const MongoLinkRepository = require("./src/mongo/mongo_link_repository");
+  dbImpl = new MongoLinkRepository(db);
 } else {
   const db = require("./src/postgres/db");
   const PgLinkRepository = require("./src/postgres/pg_link_repository");
   dbImpl = new PgLinkRepository(db);
+  console.log("Using PostgreSQL");
 }
 
 //Use src/router.js
 app.use("/", makeRouter(dbImpl));
 
-app.listen(config.listeningPort, "0.0.0.0", function () {
-  console.log(`Listening on port ${config.listeningPort}`);
+app.listen(config.LISTENING_PORT, "0.0.0.0", function () {
+  console.log(`Listening on port ${config.LISTENING_PORT}`);
 });

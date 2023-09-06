@@ -7,7 +7,7 @@ const updateEntry2 =
   "UPDATE url_shortener SET issuedDate = :issuedDate WHERE longURL = :longUrl RETURNING shortURL";
 
 const createEntry =
-  "INSERT INTO url_shortener (longURL, shortURL, issuedDate) VALUES ($1, $2, $3) RETURNING shortURL";
+  "INSERT INTO url_shortener (longURL, shortURL, issuedDate) VALUES ($1, $2, $3) RETURNING shortURL, longURL, issuedDate";
 
 const findEntry = "SELECT longURL FROM url_shortener WHERE shortURL = $1";
 

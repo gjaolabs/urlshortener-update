@@ -13,19 +13,21 @@ function makeController(db) {
       const linkCount = await linkRepository.countLink(url);
 
       // TODO: refactor response to be number not rows
-      if (linkCount > 0) {
+
+      if (linkCount) {
         //Entry exists, update DATE, return shortURL JSON
         const results = await linkRepository.updateLink(url, now);
         return res
           .status(200)
-          .json({ message: "Entry Updated.", response: results.rows });
+          .json({ message: "Entry Updated.", response: results });
       } else {
         //Entry does not exist. Create new entry, return shortURL JSON
         const shorturl = shorten();
         const results = await linkRepository.saveLink(url, shorturl, now);
+
         return res
           .status(200)
-          .json({ message: "New Entry Created.", response: results.rows });
+          .json({ message: "New Entry Created.", response: results });
       }
     } catch (error) {
       console.error("Error Executing Query", error);
@@ -39,12 +41,12 @@ function makeController(db) {
     const shorturl = req.params.shorturl;
     try {
       const foundLink = await linkRepository.getLink(shorturl);
-      console.log(foundLink);
+
       //If entry exists return longURL
-      if (foundLink.rows[0]) {
+      if (foundLink?.longURL) {
         res.status(200).json({
           message: "URL Has Been Found.",
-          response: foundLink.rows,
+          response: foundLink,
         });
       } else {
         res.status(200).json({ message: "Entry Does Not Exist." });
@@ -60,10 +62,9 @@ function makeController(db) {
     const shorturl = req.params.shorturl;
     try {
       const foundLink = await linkRepository.getLink(shorturl);
-      console.log(foundLink);
 
-      if (foundLink.rows[0]) {
-        res.status(302).redirect(foundLink.rows[0].longurl);
+      if (foundLink?.longURL) {
+        res.status(302).redirect(foundLink.longURL);
       } else {
         res
           .status(200)
