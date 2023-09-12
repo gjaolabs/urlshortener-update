@@ -20,28 +20,11 @@ console.log(
   process.env.PORT
 );
 
-//Bash script initialize database
-const { exec } = require("child_process");
-
-// Define the path to your Bash script
-const scriptPath = "src/postgres/db_init.sh";
-
-// Execute the Bash script
-exec(`bash ${scriptPath}`, (error, stdout, stderr) => {
-  if (error) {
-    console.error(`Error executing the script: ${error}`);
-    return;
-  }
-
-  console.log(`Script output:\n${stdout}`);
-  console.error(`Script errors:\n${stderr}`);
-});
-//////////////////////////////////////////////////
 
 const urlPool = new Pool({
   user: process.env.USER,
   host: process.env.HOST,
-  database: "url_shortener",
+  database: process.env.DATABASE,
   password: process.env.PASSWORD,
   port: process.env.PORT,
 });
@@ -53,7 +36,7 @@ const { Client } = require("pg");
 const client = new Client({
   user: process.env.USER,
   host: process.env.HOST,
-  database: process.env.DATABASE,
+  database: "url_shortener",
   password: process.env.PASSWORD,
   port: process.env.PORT,
 });
