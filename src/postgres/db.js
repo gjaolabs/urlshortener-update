@@ -20,7 +20,6 @@ console.log(
   process.env.PORT
 );
 
-
 const urlPool = new Pool({
   user: process.env.USER,
   host: process.env.HOST,
