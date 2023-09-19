@@ -20,7 +20,6 @@ async function removeOldEntriesMongo() {
     const deleteObj = await db.URL.deleteMany({
       issuedDate: { $lte: thirtyDaysAgo },
     });
-    console.log("deleteObj: ", deleteObj);
     console.log(`Number of documents deleted: ${deleteObj.deletedCount}`);
   } catch (err) {
     console.error("Error: ", err);
@@ -29,7 +28,28 @@ async function removeOldEntriesMongo() {
 
 //Here we create an identical functionality for Postgres
 
-async function removeOldEntriesPostgres() {}
+async function removeOldEntriesPostgres() {
+  const db = require("./postgres/db");
+  const countEntry = `SELECT COUNT(*) FROM url_shortener WHERE issuedDate < NOW() - INTERVAL '30 days';
+  `;
+  const deleteEntry = `DELETE FROM url_shortener WHERE issuedDate < NOW() - INTERVAL '30 days';
+`;
+
+  try {
+    var deleteCount = await db.query(countEntry);
+    console.log("deleteCount: ", deleteCount);
+  } catch (error) {
+    console.log("Error executing query: ", error);
+  } finally {
+    if (deleteCount?.rows[0].count) {
+      console.log(
+        "Number of documents to be deleted: ",
+        deleteCount.rows[0].count
+      );
+      await db.query(deleteEntry);
+    }
+  }
+}
 
 // Here we create the cron scheduler
 const cron = require("node-cron");
@@ -46,7 +66,7 @@ function scheduler() {
       ? removeOldEntriesMongo()
       : removeOldEntriesPostgres();
 
-    console.log("Task executed every thirty days.");
+    console.log("Task executed every ten seconds.");
   });
 
   // Start the cron job
