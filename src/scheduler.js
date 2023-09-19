@@ -11,15 +11,16 @@ To ensure that your tasks are executed on a regular schedule, your Node.js scrip
 async function removeOldEntriesMongo() {
   //Connect to MongoDB
   const mongoConnect = require("./mongo/connector");
-  const URL = require("./mongo/models");
+  const db = require("./mongo/models");
 
   mongoConnect.connect();
 
   const thirtyDaysAgo = Date.now() - 2592000000;
   try {
-    const deleteObj = await URL.deleteMany({
+    const deleteObj = await db.URL.deleteMany({
       issuedDate: { $lte: thirtyDaysAgo },
     });
+    console.log("deleteObj: ", deleteObj);
     console.log(`Number of documents deleted: ${deleteObj.deletedCount}`);
   } catch (err) {
     console.error("Error: ", err);
@@ -33,10 +34,17 @@ async function removeOldEntriesPostgres() {}
 // Here we create the cron scheduler
 const cron = require("node-cron");
 
+const config = require("../config");
+
 function scheduler() {
+  console.log("Message from scheduler");
+
   // Schedule a task to run every thirty days
-  const task = cron.schedule("0 */12 * * *", () => {
+  const task = cron.schedule("*/10 * * * * *", () => {
     // Your task code goes here
+    config?.DB_TYPE === "mongo"
+      ? removeOldEntriesMongo()
+      : removeOldEntriesPostgres();
 
     console.log("Task executed every thirty days.");
   });

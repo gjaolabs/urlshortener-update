@@ -5,6 +5,7 @@ const app = express();
 const config = require("./config");
 const makeRouter = require("./src/router");
 const mongoConnect = require("./src/mongo/connector");
+const scheduler = require("./src/scheduler");
 
 // Express Configuration
 app.use(cors());
@@ -16,6 +17,9 @@ app.use("/public", express.static(`${process.cwd()}/public`));
 app.get("/", function (req, res) {
   res.sendFile(process.cwd() + "/views/index.html");
 });
+
+//Run scheduler
+scheduler();
 
 // setup database
 let dbImpl;
