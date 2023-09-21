@@ -1,9 +1,12 @@
 const mongoose = require("mongoose");
-const { MONGO_DB_URL } = require('./config')
+require("dotenv").config({
+  override: true,
+  path: "././development.env",
+});
 
 function connect() {
   mongoose
-    .connect(MONGO_DB_URL)
+    .connect(process.env.MONGO_DB_URL)
     .then(() => console.log("DB CONNECTION SUCCESFUL"))
     .catch((err) => console.error(err));
 }
@@ -14,5 +17,5 @@ function connState() {
 
 module.exports = {
   connect,
-  connState
-}
+  connState,
+};

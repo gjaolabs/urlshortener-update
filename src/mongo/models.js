@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+const mongoose = require("mongoose");
 
 const URLSchema = mongoose.Schema(
   {
@@ -12,5 +12,5 @@ const URLSchema = mongoose.Schema(
 const URL = mongoose.model("URL", URLSchema);
 
 module.exports = {
-  URL: URL
-}
+  URL: URL,
+};

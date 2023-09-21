@@ -1,15 +1,3 @@
-async function removeOldEntries(URL) {
-  const thirtyDaysAgo = Date.now() - 2592000000;
-  try {
-    const deleteObj = await URL.deleteMany({
-      issuedDate: { $lte: thirtyDaysAgo },
-    });
-    console.log(`Number of documents deleted: ${deleteObj.deletedCount}`);
-  } catch (err) {
-    console.error("Error: ", err);
-  }
-}
-
 //Might need to update the RNG with another library
 function shorten() {
   const characters =
@@ -21,7 +9,14 @@ function shorten() {
   return shortURL;
 }
 
-module.exports = {
-  removeOldEntries,
-  shorten
+//Create Date object and convert to Postgres-appropriate format
+function dateToISO() {
+  const currentDate = new Date();
+  const postgresDateTime = currentDate.toISOString();
+  return postgresDateTime;
 }
+
+module.exports = {
+  shorten,
+  dateToISO,
+};

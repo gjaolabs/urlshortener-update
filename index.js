@@ -1,30 +1,42 @@
 require("dotenv").config();
-const { connect: mongoConnect, connState } = require('./mongo-connector')
 const express = require("express");
 const cors = require("cors");
 const app = express();
-const { LISTENING_PORT } = require('./config')
-const apiRoutes = require('./src/api-routes')
-
-mongoConnect()
+const config = require("./config");
+const makeRouter = require("./src/router");
+const mongoConnect = require("./src/mongo/connector");
 
 // Express Configuration
 app.use(cors());
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/public", express.static(`${process.cwd()}/public`));
-
-// Get DB health
-app.get("/db-health", (req, res) => {
-  res.json({ status: connState() });
-});
 
 // Serve index page
 app.get("/", function (req, res) {
   res.sendFile(process.cwd() + "/views/index.html");
 });
 
-apiRoutes(app)
+// setup database
+let dbImpl;
 
-app.listen(LISTENING_PORT, "0.0.0.0", function () {
-  console.log(`Listening on port ${LISTENING_PORT}`);
+if (config?.DB_TYPE === "mongo") {
+  mongoConnect.connect();
+  console.log("Using MongoDB");
+  console.log(mongoConnect.connState());
+  const db = require("./src/mongo/models");
+  const MongoLinkRepository = require("./src/mongo/mongo_link_repository");
+  dbImpl = new MongoLinkRepository(db);
+} else {
+  const db = require("./src/postgres/db");
+  const PgLinkRepository = require("./src/postgres/pg_link_repository");
+  dbImpl = new PgLinkRepository(db);
+  console.log("Using PostgreSQL");
+}
+
+//Use src/router.js
+app.use("/", makeRouter(dbImpl));
+
+app.listen(config.LISTENING_PORT, "0.0.0.0", function () {
+  console.log(`Listening on port ${config.LISTENING_PORT}`);
 });
