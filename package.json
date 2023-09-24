@@ -1,6 +1,6 @@
 {
   "name": "shorturl",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "API project for freeCodeCamp",
   "main": "index.js",
   "scripts": {
