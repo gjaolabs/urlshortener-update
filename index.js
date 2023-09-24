@@ -1,70 +1,42 @@
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
+require("dotenv").config();
+const express = require("express");
+const cors = require("cors");
 const app = express();
+const config = require("./config");
+const makeRouter = require("./src/router");
+const mongoConnect = require("./src/mongo/connector");
 
-// Basic Configuration
-const port = process.env.PORT || 3000;
-
+// Express Configuration
 app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use("/public", express.static(`${process.cwd()}/public`));
 
-app.use(express.urlencoded({extended: true}))
-
-app.use('/public', express.static(`${process.cwd()}/public`));
-
-app.get('/', function(req, res) {
-  res.sendFile(process.cwd() + '/views/index.html');
+// Serve index page
+app.get("/", function (req, res) {
+  res.sendFile(process.cwd() + "/views/index.html");
 });
 
-// Your first API endpoint
-app.get('/api/hello', function(req, res) {
-  res.json({ greeting: 'hello API' });
-});
+// setup database
+let dbImpl;
 
-// You can POST a URL to /api/shorturl and get a JSON response with original_url and short_url properties. Here's an example: { original_url : 'https://freeCodeCamp.org', short_url : 1}
-// When you visit /api/shorturl/<short_url>, you will be redirected to the original URL.
-// If you pass an invalid URL that doesn't follow the valid http://www.example.com format, the JSON response will contain { error: 'invalid url' }
+if (config?.DB_TYPE === "mongo") {
+  mongoConnect.connect();
+  console.log("Using MongoDB");
+  console.log(mongoConnect.connState());
+  const db = require("./src/mongo/models");
+  const MongoLinkRepository = require("./src/mongo/mongo_link_repository");
+  dbImpl = new MongoLinkRepository(db);
+} else {
+  const db = require("./src/postgres/db");
+  const PgLinkRepository = require("./src/postgres/pg_link_repository");
+  dbImpl = new PgLinkRepository(db);
+  console.log("Using PostgreSQL");
+}
 
-const originalUrls = [];
-const shortUrls = [];
+//Use src/router.js
+app.use("/", makeRouter(dbImpl));
 
-app.post("/api/shorturl", (req, res) => {
-  const url = req.body.url;
-
-  const foundIndex = originalUrls.indexOf(url);
-
-  if(!url.includes("https://") && !url.includes("http://")){
-    return res.json({ error: 'invalid url' })
-  }
-
-  if(foundIndex < 0) {
-    originalUrls.push(url)
-    shortUrls.push(shortUrls.length)
-
-    return res.json({
-      original_url: url,
-      short_url: shortUrls.length - 1
-    })
-  }
-
-  return res.json({
-    original_url: url,
-    short_url: shortUrls[foundIndex]
-  })
-
-})
-
-app.get("/api/shorturl/:shorturl", (req, res) => {
-  const shorturl = parseInt(req.params.shorturl);
-  const foundIndex = shortUrls.indexOf(shorturl)
-
-  if(foundIndex < 0) {
-    return res.json({"error": "No short URL found for the given unput"})
-  }
-  
-  res.redirect(originalUrls[foundIndex])
-})
-
-app.listen(port, "0.0.0.0", function() {
-  console.log(`Listening on port ${port}`);
+app.listen(config.LISTENING_PORT, "0.0.0.0", function () {
+  console.log(`Listening on port ${config.LISTENING_PORT}`);
 });
