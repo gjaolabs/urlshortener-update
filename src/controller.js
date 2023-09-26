@@ -1,12 +1,11 @@
-const queries = require("./postgres/queries");
-const { dateToISO, shorten } = require("./util.js");
+const { dateToISO, shorten, addPrefix } = require("./util.js");
 const LinkRepository = require("./link_repository");
 
 function makeController(db) {
   const linkRepository = new LinkRepository(db);
 
   const postEntry = async (req, res) => {
-    const url = req.body.url;
+    const url = addPrefix(req.body.url);
     const now = dateToISO();
     try {
       //Check if it exists, if YES update Date, return JSON
