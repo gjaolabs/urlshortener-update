@@ -13,12 +13,14 @@ async function removeOldEntriesMongo() {
   const mongoConnect = require("./mongo/connector");
   const db = require("./mongo/models");
 
-  mongoConnect.connect();
+  if (mongoConnect.connState() === 0) {
+    mongoConnect.connect();
+  }
 
   const thirtyDaysAgo = Date.now() - 2592000000;
   try {
     const deleteObj = await db.URL.deleteMany({
-      issuedDate: { $lte: thirtyDaysAgo }
+      issuedDate: { $lte: thirtyDaysAgo },
     });
     console.log(`Number of documents deleted: ${deleteObj.deletedCount}`);
   } catch (err) {
