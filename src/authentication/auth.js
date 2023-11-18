@@ -26,17 +26,17 @@ const login = async (req, res) => {
       { expiresIn: "1h" }
     );
 
-    res.json({ token: token, message: "Token created successfully" });
-
     //Include token in HTTP headers
-
-    req.header["Authorization"] = token;
+    res.set("Authorization", token);
+    const { exp } = jwt.decode(token);
+    res.json({ token: token, message: "Token created successfully", exp: exp });
   } else {
     res.status(401).json({ message: "Invalid credentials" });
   }
 };
 
 const verifyToken = async (req, res, next) => {
+  console.log(req.header);
   const token = req.header["Authorization"];
 
   if (!token) {
