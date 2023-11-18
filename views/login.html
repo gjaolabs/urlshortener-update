@@ -38,9 +38,8 @@
       const formData = serializeFormData(form);
 
       const loginResponse = await executeLogin(formData);
-      console.log(loginResponse);
+
       if (loginResponse.login) {
-        console.log("good");
         localStorage.setItem("authToken", loginResponse.token);
         window.location.href = "/";
       } else {

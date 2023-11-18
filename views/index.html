@@ -28,7 +28,7 @@
               name="url"
               placeholder="https://www.freecodecamp.org/"
             />
-            <input type="submit" value="POST URL" />
+            <input type="button" value="POST URL" onclick="createLink(this)" />
           </fieldset>
         </form>
       </section>
@@ -37,4 +37,30 @@
       <p>By <a href="https://www.freecodecamp.org/">freeCodeCamp</a></p>
     </footer>
   </body>
+  <script>
+    async function createLink(button) {
+      // serialize form and pass to endpoint
+      let formData;
+      let response;
+      try {
+        response = await fetch("/api/shorturl", {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: localStorage.getItem("authToken"),
+          },
+          body: JSON.stringify(formData),
+        });
+      } catch (e) {
+        console.error(e.message);
+        return { login: false, message: "server is not responding" };
+      }
+    }
+
+    // create FE logic after succesfully saving of link
+    // response will contain link json data
+    // create popup that will render the link
+    // response.json()
+  </script>
 </html>

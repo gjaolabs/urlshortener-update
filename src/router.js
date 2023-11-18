@@ -1,7 +1,7 @@
 const { Router } = require("express");
 const makeController = require("./controller");
 const { validateURL } = require("./url_validation");
-const { login, verifyToken } = require("./authentication/auth");
+const { login, verifyToken, verifyLogin } = require("./authentication/auth");
 
 function makeRoutes(db) {
   const router = Router();
@@ -13,6 +13,7 @@ function makeRoutes(db) {
   router.get("/open/:shorturl", controller.getRedirect);
   //Auth route
   router.post("/login", login);
+  router.head("/login/verify", verifyLogin);
 
   return router;
 }

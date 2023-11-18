@@ -1,5 +1,24 @@
 // common js functions
-console.log("Koko");
+document.addEventListener("DOMContentLoaded", async function () {
+  console.log(window.location);
+  const path = window.location.pathname;
+  try {
+    response = await fetch("/login/verify", {
+      method: "HEAD",
+      headers: {
+        Authorization: localStorage.getItem("authToken"),
+      },
+    });
+  } catch (e) {
+    console.error(e.message);
+  }
+
+  if (!response.ok && path !== "/login") {
+    window.location.href = "/login";
+  } else if (response.ok && path == "/login") {
+    window.location.href = "/";
+  }
+});
 
 async function executeLogin(formData) {
   let response;
@@ -17,7 +36,6 @@ async function executeLogin(formData) {
     return { login: false, message: "server is not responding" };
   }
 
-  console.log(response);
   if (response.ok) {
     const successObject = await response.json();
     return { login: true, ...successObject };
