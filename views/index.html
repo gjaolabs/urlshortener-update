@@ -26,7 +26,7 @@
               id="url_input"
               type="text"
               name="url"
-              placeholder="https://www.freecodecamp.org/"
+              value="https://www.freecodecamp.org/"
             />
             <input type="button" value="POST URL" onclick="createLink(this)" />
           </fieldset>
@@ -40,7 +40,10 @@
   <script>
     async function createLink(button) {
       // serialize form and pass to endpoint
-      let formData;
+      const form = document.getElementById("linkForm");
+
+      let formData = serializeFormData(form);
+      console.log(formData);
       let response;
       try {
         response = await fetch("/api/shorturl", {
