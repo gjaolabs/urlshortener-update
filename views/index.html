@@ -2,12 +2,24 @@
 
 <html>
   <head>
+    <!-- Include Handlebars library -->
+
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.8/handlebars.min.js"
+      integrity="sha512-E1dSFxg+wsfJ4HKjutk/WaCzK7S2wv1POn1RRPGh8ZK+ag9l244Vqxji3r6wgz9YBf6+vhQEYJZpSjqWFPg9gg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+
+    <script src="public/common.js" defer></script>
+
     <title>URL Shortener Microservice | freeCodeCamp.org</title>
     <link
       rel="icon"
       type="image/png"
       href="https://cdn.freecodecamp.org/universal/favicons/favicon-16x16.png"
     />
+
     <link href="/public/style.css" rel="stylesheet" type="text/css" />
   </head>
 
@@ -15,7 +27,7 @@
     <h1>URL Shortener Microservice</h1>
     <main>
       <section>
-        <form action="api/shorturl" method="POST">
+        <form action="api/shorturl" method="POST" , id="linkForm">
           <fieldset>
             <legend>URL Shortener</legend>
             <label for="url_input">URL:</label>
@@ -23,15 +35,81 @@
               id="url_input"
               type="text"
               name="url"
-              placeholder="https://www.freecodecamp.org/"
+              value="https://www.freecodecamp.org/"
             />
-            <input type="submit" value="POST URL" />
+            <input type="button" value="POST URL" onclick="createLink(this)" />
           </fieldset>
         </form>
+        <div id="table-container"></div>
+        <script id="table-template" type="text/x-handlebars-template">
+          <table>
+            <thead>
+              <tr>
+                <th>Short URL</th>
+                <th>Date Issued</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#each data}}
+                <tr>
+                  <td>{{shortURL}}</td>
+                  <td>{{issuedDate}}</td>
+                </tr>
+              {{/each}}
+            </tbody>
+          </table>
+        </script>
       </section>
     </main>
     <footer>
       <p>By <a href="https://www.freecodecamp.org/">freeCodeCamp</a></p>
     </footer>
   </body>
+  <script>
+    async function createLink(button) {
+      // serialize form and pass to endpoint
+      const form = document.getElementById("linkForm");
+
+      let formData = serializeFormData(form);
+
+      let response;
+      try {
+        response = await fetch("/api/shorturl", {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: localStorage.getItem("authToken"),
+          },
+          body: JSON.stringify(formData),
+        });
+        let responseData = await response.json();
+
+        // Check if the response is successful (adjust this based on your API response structure)
+        if (response.ok) {
+          renderTable([responseData.response]);
+        } else {
+          console.error(responseData.message); // Handle error messages from the server
+        }
+      } catch (e) {
+        console.error(e.message);
+        // Handle network errors or other issues
+      }
+    }
+
+    // create FE logic after succesfully saving of link
+
+    // Handlebars function
+    function renderTable(data) {
+      // Compile the Handlebars template
+      var source = document.getElementById("table-template").innerHTML;
+      var template = Handlebars.compile(source);
+
+      // Render the template with the data
+      var html = template({ data: data });
+
+      // Insert the rendered HTML into the "table-container"
+      document.getElementById("table-container").innerHTML = html;
+    }
+  </script>
 </html>

@@ -62,13 +62,12 @@ function scheduler() {
   console.log("Message from scheduler");
 
   // Schedule a task to run every thirty days
-  const task = cron.schedule("*/10 * * * * *", () => {
-    // Your task code goes here
+  const task = cron.schedule("0 0 * * *", () => {
     config?.DB_TYPE === "mongo"
       ? removeOldEntriesMongo()
       : removeOldEntriesPostgres();
 
-    console.log("Task executed every ten seconds.");
+    console.log("Task executed every 24 hours at midnight.");
   });
 
   // Start the cron job

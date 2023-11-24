@@ -18,6 +18,10 @@ app.get("/", function (req, res) {
   res.sendFile(process.cwd() + "/views/index.html");
 });
 
+app.get("/login", (req, res) => {
+  res.sendFile(process.cwd() + "/views/login.html");
+});
+
 //Run scheduler
 scheduler();
 

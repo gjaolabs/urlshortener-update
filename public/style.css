@@ -42,3 +42,22 @@ input[type="text"] {
   width: 220px;
   text-align: center;
 }
+
+/* Add borders to the table */
+table {
+  border-collapse: collapse;
+  max-width: 600px; /* Adjust the width as needed */
+  margin: 10px auto; /* Center the table on the window */
+  padding: 20px;
+}
+
+th,
+td {
+  border: 1px solid black; /* Inner borders for cells */
+  padding: 8px; /* Add padding for better visual appearance */
+  text-align: center; /* Center text in cells */
+}
+
+#table-container {
+  margin: 20px;
+}

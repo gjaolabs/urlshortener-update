@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="public/common.js" defer></script>
+    <title>Login</title>
+  </head>
+  <body>
+    <form method="POST" id="loginForm">
+      <fieldset>
+        <label for="username_input"> Username: </label>
+        <input
+          id="username_input"
+          type="text"
+          name="username"
+          placeholder="Your Username"
+        />
+
+        <label for="password_input"> Password: </label>
+        <input
+          type="password"
+          name="password"
+          id="password_input"
+          placeholder="Your Password"
+        />
+        <input type="button" value="Login" onclick="login(this);" />
+      </fieldset>
+    </form>
+  </body>
+
+  <script>
+    async function login(button) {
+      button.setAttribute("disabled", true);
+
+      const form = document.getElementById("loginForm");
+      const formData = serializeFormData(form);
+
+      const loginResponse = await executeLogin(formData);
+
+      if (loginResponse.login) {
+        localStorage.setItem("authToken", loginResponse.token);
+        window.location.href = "/";
+      } else {
+        alert(loginResponse.message);
+        button.removeAttribute("disabled");
+      }
+    }
+  </script>
+</html>
