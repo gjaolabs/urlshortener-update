@@ -1,6 +1,5 @@
 // common js functions
 document.addEventListener("DOMContentLoaded", async function () {
-  console.log(window.location);
   const path = window.location.pathname;
   try {
     response = await fetch("/login/verify", {
